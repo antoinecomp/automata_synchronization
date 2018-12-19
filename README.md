@@ -19,7 +19,7 @@ and
 have two automata of states, transition and events (Etat, Transition, evenements) and I want to create a function that create the synchronized product between those two automata. For instance, given plant and spec automata, plant :
 
 The product of A and B is the automaton : 
-$$A \times B := Ac⟨Q_A \times Q_B, \sum A \bigcap \sum B, \delta, i_A.i_B, M_A \times M_B⟩$$
+$A \times B := Ac⟨Q_A \times Q_B, \sum A \bigcap \sum B, \delta, i_A.i_B, M_A \times M_B⟩$
 
 where $Q_A \times Q_B$ is the combination of all states. If $QA = \{a_1, a2\}$ and QB = {b1, b2}
 then QA × QB = {a1.b1, a1.b2, a2.b1, a2.b2}
