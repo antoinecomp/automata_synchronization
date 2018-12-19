@@ -29,3 +29,6 @@ then QA × QB = {a1.b1, a1.b2, a2.b1, a2.b2}
 δ(qA.qB, e) := {
 δA(qA, e).δB(qB, e) if δA(qA, e) and δB(qB, e) defined
 undefined otherwise
+
+
+  [1]: https://i.stack.imgur.com/1blWq.png
