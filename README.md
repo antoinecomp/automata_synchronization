@@ -16,7 +16,10 @@ and
 (Etat : S2, [Transition : (S2,S1,[Evenement : s1, Evenement : s2, Evenement : s3])])
 ``` 
 
-have two automata of states, transition and events (Etat, Transition, evenements) and I want to create a function that create the synchronized product between those two automata. For instance, given plant and spec automata, plant :
+Would be :
+
+[![synchronization][1]][1]
+
 
 The product of A and B is the automaton : 
 $A \times B := Ac⟨Q_A \times Q_B, \sum A \bigcap \sum B, \delta, i_A.i_B, M_A \times M_B⟩$
