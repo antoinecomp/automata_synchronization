@@ -271,7 +271,7 @@ class Probleme:
             self.spec.ajouterTransition(nomDepart,nomArrivee,listeNomsEvt)
             
     def creerplantspec(self,donnees):
-        """method to creat the synchronisation automata.
+        """method to create the synchronised automata.
 
         Args:
             donnees (:obj:`list` of :obj:`str`): name, events, transition and states of the synchronisation automata.
@@ -332,6 +332,31 @@ monProbleme.plant.sAfficher()
 monProbleme.creerspec(donneesSpec)
 monProbleme.spec.sAfficher()
 
-# on va synchroniser
+# we're going to synchronize
+def synchroniserProbleme(probleme):
+    # we're saving the states of both
+    etat_plant = probleme.plant.etats
+    etat_spec = probleme.spec.etats
+    # we create the automaton merging  plant and spec automata
+    autoSynchro = Automate("synchro",probleme)
+    # then we synchronize it with all the states
+    for etat_p in etat_plant:
+        for etat_s in etat_spec:
+            synchroniserEtats(autoSynchro, etat_p, etat_s, probleme) 
+
+    
+def synchroniserEtats(automateSynchronise, etat_1, etat_2, probleme):
+    # we're adding a new state merging the given ones, we're specifying if it is initial with all and final with any
+    automateSynchronise.ajouterEtat(str(etat_1.nom + etat_2.nom), all(etat_1.initial,etat_2.initial), any(etat_1.final, etat_2.final))
+    # 
+    for transition_1 in etat_1.transitionsSortantes:
+        for transition_2 in etat_2.transitionsSortantes:
+            # we're going to find the subset of the events that are part of both transitions
+            ev = list(set(transition_1.evenements).intersection(transition_2.evenements))
+            # we're going to create the transition in the merging automaton
+            automateSynchronise.ajouterTransition(str(etat_1+etat_2),transition_1.arrivee,transition_2.arrivee, ev)
+
+synchroniserProbleme(monProbleme)
+        
     
    
