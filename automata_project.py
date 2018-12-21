@@ -140,6 +140,7 @@ class Automate:
         objEtat=Etat(nom,initial,final)
         self.etats.append(objEtat)
         self.etatNomme[nom]=objEtat
+        #print(self.etatNomme[nom])
     
     def ajouterTransition(self,nomEtatDepart,nomEtatArrivee,listeNomsEvts):
         """instiate and add a Transition to the automata, precising where it goes from and to.
@@ -347,14 +348,17 @@ def synchroniserProbleme(probleme):
     
 def synchroniserEtats(automateSynchronise, etat_1, etat_2, probleme):
     # we're adding a new state merging the given ones, we're specifying if it is initial with all and final with any
-    automateSynchronise.ajouterEtat(str(etat_1.nom + etat_2.nom), all(etat_1.initial,etat_2.initial), any(etat_1.final, etat_2.final))
+    print str(etat_1.nom + etat_2.nom)
+    automateSynchronise.ajouterEtat(str(etat_1.nom + etat_2.nom), all([etat_1.initial,etat_2.initial]), any([etat_1.final, etat_2.final]))
+    
     # 
     for transition_1 in etat_1.transitionsSortantes:
         for transition_2 in etat_2.transitionsSortantes:
+            automateSynchronise.ajouterEtat(str(transition_1.arrivee.nom+transition_2.arrivee.nom), all([transition_1.arrivee.nom,transition_2.arrivee.nom]), any([transition_1.arrivee.nom,transition_2.arrivee.nom]))
             # we're going to find the subset of the events that are part of both transitions
             ev = list(set(transition_1.evenements).intersection(transition_2.evenements))
             # we're going to create the transition in the merging automaton
-            automateSynchronise.ajouterTransition(str(etat_1+etat_2),transition_1.arrivee,transition_2.arrivee, ev)
+            automateSynchronise.ajouterTransition(str(etat_1.nom+etat_2.nom),str(transition_1.arrivee.nom+transition_2.arrivee.nom), ev)
 
 synchroniserProbleme(monProbleme)
         
