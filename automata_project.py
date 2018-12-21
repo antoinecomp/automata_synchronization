@@ -311,15 +311,14 @@ class Probleme:
                 evs = list(set(transition_1.evenements).intersection(transition_2.evenements))
                 # we filter the names 
                 evs = [ev.nom for ev in evs]
-                
-                
+                # 
                 self.plantspec.ajouterTransition(str(etat_1.nom+etat_2.nom),str(transition_1.arrivee.nom+transition_2.arrivee.nom), evs)
 
 donnees=("nomprob", # name of the problem
         [("e1",True),("e2",True),("e3",True),("s1",False),("s2",False),("s3",False)], # events
         ("plant",[("S4",True,False),("S1",False,False),("S2",False,True)], # first automata states
             [("S4","S1",["e1","e2","e3"]),("S1","S2",["e1","e3"]),("S1","S4",["s1","s2","s3"]),("S2","S1",["s1","s2","s3"])]), # first automata transitions
-        ("spec",[("S0",True,False),("S1",False,False),("S2",False,True)], #second automata s.t0ates
+        ("spec",[("S0",True,False),("S1",False,False),("S2",False,True)], #second automata states
             [("S0","S1",["e1","e2","e3"]),("S1","S2",["e1","e2","e3"]),("S1","S0",["s1","s2","s3"]),("S2","S1",["s1","s2","s3"])] # second automata transitions
         )
     )
@@ -343,6 +342,34 @@ monProbleme.spec.sAfficher()
 
 # my attempt
 monProbleme.synchroniserProbleme()
+
+print 
+
+# visualise it
+# libraries
+
+import pandas as pd
+import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
+ 
+# Build a dataframe 
+fro =  [transition.depart.nom for transition in monProbleme.plantspec.transitions]
+to = [transition.arrivee.nom for transition in monProbleme.plantspec.transitions]
+
+df = pd.DataFrame({ 'from':fro, 'to':to})
+
+print fro
+
+print to
+
+# Build your graph
+G=nx.from_pandas_edgelist(df, 'from', 'to')
+ 
+# Plot it
+nx.draw(G, with_labels=True)
+plt.show()
+
         
     
    
