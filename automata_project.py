@@ -82,12 +82,10 @@ class Transition:
         self.evenements=[]
         self.depart.ajouterTransitionSortante(self)
     
-    #@property
     def __str__(self):
         """str: give back ???"""
         return'({},{},{})'.format(self.depart,self.arrivee,self.evenements)
 
-    #6/6666666666666666666@property
     def __repr__(self) :
         """str: give back ???"""
         return 'Transition : {}'.format(self)
@@ -121,12 +119,10 @@ class Automate:
         self.etatNomme={} # cle : nom, valeur : obj
         self.transitions=[]
         
-    #@property    
     def __str__(self):
         """str: give back the name of the automata"""
         return'{}'.format(self.nom)
     
-    #@property
     def __repr__(self) :
         """str: give back ???"""
         return 'Automate : {}'.format(self)
@@ -148,7 +144,7 @@ class Automate:
         Args:
             nomEtatDepart (str): the name of the transition starting point.
             nomEtatArrivee (str): the name of the transition ending point.
-            listeNomsEvts (:obj:`list` of :obj:`str`): list of the events required for transitionning from a state to another.
+            listeNomsEvts (:obj:`list` of :obj:`str`): list of the name of the events required for transitionning from a state to another.
             
         Attributes:
             objEtatDepart (Etat): state from which the Transition starts
@@ -159,7 +155,8 @@ class Automate:
         objEtatArrivee=self.etatNomme[nomEtatArrivee]
         objtrans=Transition(objEtatDepart,objEtatArrivee)
         self.transitions.append(objtrans)
-    
+        #print "evenements nommes de {}"
+        #print self.probleme.evtNomme
         for nom in listeNomsEvts :
             objEvt=self.probleme.evtNomme[nom] # ???
             objtrans.enregistrerEvt(objEvt) 
@@ -204,12 +201,10 @@ class Probleme:
         self.evtNomme={} # cle : nom, valeur : obj
         
     
-    @property
     def __str__(self):
         """return name of the problem"""
         return'{}'.format(self.nom)
 
-    @property      
     def __repr__(self) :
         """return ???"""
         return 'Probleme : {}'.format(self)
@@ -284,28 +279,41 @@ class Probleme:
         self.plantspec=Automate(nom,self)
         for elt in donneesEtats :
             nom,initial,final=elt
-           
-            (self.spec+self.plant).ajouterEtat(nom,initial,final)
+            
         for elt in donneesTransitions:
             nomDepart,nomArrivee,listeNomsEvt=elt
             self.spec.ajouterTransition(nomDepart,nomArrivee,listeNomsEvt)
             
-         
-         
-        
+    # we're going to synchronize
+    def synchroniserProbleme(self):
+        # we're saving the states of both
+        etat_plant = self.plant.etats
+        etat_spec = self.spec.etats
+        # we create the automaton merging  plant and spec automata
+        self.plantspec = Automate("synchro",self)
+        print self.evtNomme
+        # then we synchronize it with all the states
+        for etat_p in etat_plant:
+            for etat_s in etat_spec:
+                self.synchroniserEtats(etat_p, etat_s, self) 
 
-'''donnees=("nomprob", #nom
-        [("e1",True),("e2",True),("e3",True),("s1",False),("s2",False),("s3",False)], # donneesEvts
-        ("plant", # donneesPlant
-            [("S4",True,False),("S1",False,False),("S2",False,True)], # states 
-            [("S4","S1",["e1","e2","e3"]),("S1","S2",["e1","e3"]),("S1","S4",["s1","s2","s3"]),("S2","S1",["s1","s2","s3"])] # transitions
-        ), 
-        ("spec", # donneesSpec
-            [("S0",True,False),("S1",False,False),("S2",False,True)],# state
-            [("S0","S1",["e1","e2","e3"]),("S1","S2",["e1","e2","e3"]),("S1","S0",["s1","s2","s3"]),("S2","S1",["s1","s2","s3"])] # transitions
-        )
-    ) 
- '''
+        
+    def synchroniserEtats(self, etat_1, etat_2, probleme):
+        # we're adding a new state merging the given ones, we're specifying if it is initial with all and final with any
+        print str(etat_1.nom + etat_2.nom)
+        self.plantspec.ajouterEtat(str(etat_1.nom + etat_2.nom), all([etat_1.initial,etat_2.initial]), any([etat_1.final, etat_2.final]))
+        
+        # 
+        for transition_1 in etat_1.transitionsSortantes:
+            for transition_2 in etat_2.transitionsSortantes:
+                self.plantspec.ajouterEtat(str(transition_1.arrivee.nom+transition_2.arrivee.nom), all([transition_1.arrivee.nom,transition_2.arrivee.nom]), any([transition_1.arrivee.nom,transition_2.arrivee.nom]))
+                # we're going to find the subset of the events that are part of both transitions
+                evs = list(set(transition_1.evenements).intersection(transition_2.evenements))
+                # we filter the names 
+                evs = [ev.nom for ev in evs]
+                
+                
+                self.plantspec.ajouterTransition(str(etat_1.nom+etat_2.nom),str(transition_1.arrivee.nom+transition_2.arrivee.nom), evs)
 
 donnees=("nomprob", # name of the problem
         [("e1",True),("e2",True),("e3",True),("s1",False),("s2",False),("s3",False)], # events
@@ -333,34 +341,8 @@ monProbleme.plant.sAfficher()
 monProbleme.creerspec(donneesSpec)
 monProbleme.spec.sAfficher()
 
-# we're going to synchronize
-def synchroniserProbleme(probleme):
-    # we're saving the states of both
-    etat_plant = probleme.plant.etats
-    etat_spec = probleme.spec.etats
-    # we create the automaton merging  plant and spec automata
-    autoSynchro = Automate("synchro",probleme)
-    # then we synchronize it with all the states
-    for etat_p in etat_plant:
-        for etat_s in etat_spec:
-            synchroniserEtats(autoSynchro, etat_p, etat_s, probleme) 
-
-    
-def synchroniserEtats(automateSynchronise, etat_1, etat_2, probleme):
-    # we're adding a new state merging the given ones, we're specifying if it is initial with all and final with any
-    print str(etat_1.nom + etat_2.nom)
-    automateSynchronise.ajouterEtat(str(etat_1.nom + etat_2.nom), all([etat_1.initial,etat_2.initial]), any([etat_1.final, etat_2.final]))
-    
-    # 
-    for transition_1 in etat_1.transitionsSortantes:
-        for transition_2 in etat_2.transitionsSortantes:
-            automateSynchronise.ajouterEtat(str(transition_1.arrivee.nom+transition_2.arrivee.nom), all([transition_1.arrivee.nom,transition_2.arrivee.nom]), any([transition_1.arrivee.nom,transition_2.arrivee.nom]))
-            # we're going to find the subset of the events that are part of both transitions
-            ev = list(set(transition_1.evenements).intersection(transition_2.evenements))
-            # we're going to create the transition in the merging automaton
-            automateSynchronise.ajouterTransition(str(etat_1.nom+etat_2.nom),str(transition_1.arrivee.nom+transition_2.arrivee.nom), ev)
-
-synchroniserProbleme(monProbleme)
+# my attempt
+monProbleme.synchroniserProbleme()
         
     
    
