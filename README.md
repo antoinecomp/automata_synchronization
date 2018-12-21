@@ -21,4 +21,4 @@ Would be, if I'm correct :
 [![synchronization][1]][1]
 
 
-  [1]: https://i.stack.imgur.com/1blWq.png
+  [1]: https://i.stack.imgur.com/iZCZV.png
